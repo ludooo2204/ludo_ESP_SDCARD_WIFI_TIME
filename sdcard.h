@@ -1,3 +1,9 @@
+
+#include "SD.h"
+#include "FS.h"
+
+File myFile;
+
 void listDir(fs::FS &fs, const char *dirname, uint8_t levels)
 {
     Serial.printf("Listing directory: %s\n", dirname);
@@ -79,5 +85,41 @@ void deleteFile(fs::FS &fs, const char *path)
     else
     {
         Serial.println("Delete failed");
+    }
+}
+void init_sdCard()
+{
+
+    if (!SD.begin())
+    {
+        Serial.println("Card Mount Failed");
+        return;
+    }
+    uint8_t cardType = SD.cardType();
+
+    if (cardType == CARD_NONE)
+    {
+        Serial.println("No SD card attached");
+        return;
+    }
+}
+
+void saveToSDcard(String data)
+{
+    myFile = SD.open("/dataEsp32.txt", FILE_APPEND);
+    // if the file opened okay, write to it:
+    if (myFile)
+    {
+        myFile.print(data);
+        myFile.print(";");
+
+        myFile.close();
+
+        Serial.println("sauvegarde sur card SD effectué");
+    }
+    else
+    {
+        // if the file didn't open, print an error:
+        Serial.println("erreur en ouvrant le fichier dataESP32.txt");
     }
 }
